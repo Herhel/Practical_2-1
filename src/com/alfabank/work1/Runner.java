@@ -1,5 +1,7 @@
 package com.alfabank.work1;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Runner {
@@ -32,7 +34,6 @@ public class Runner {
         book2.view();
         book3.view();*/
 
-        //1-4
         createCollection();
         printBase();
         Scanner sc = new Scanner(System.in);
@@ -45,6 +46,51 @@ public class Runner {
         } else {
             System.out.println("Вы ввели не числовое значение.");
         }
+
+        System.out.println("Введите автора:");
+        String author = sc.next();
+        if (sc.hasNextLine()) {
+            Book[] result = findByAuthor(author);
+            System.out.println("\nРезультат поиска по автору:");
+            if (result.length > 0) {
+                printForm(result);
+            } else {
+                System.out.println("По запросу '"+ author +"' ничего не найдено.");
+            }
+        } else {
+            System.out.println("Вы не ввели значение.");
+        }
+
+        System.out.println("Введите издательство:");
+        String publisher = sc.next();
+        if (sc.hasNextLine()) {
+            Book[] result = findByPublisher(publisher);
+            System.out.println("\nРезультат поиска по издательству:");
+            if (result.length > 0) {
+                printForm(result);
+            } else {
+                System.out.println("По запросу '"+ publisher +"' ничего не найдено.");
+            }
+        } else {
+            System.out.println("Вы не ввели значение.");
+        }
+
+        System.out.println("Введите год:");
+        int year;
+        if (sc.hasNextInt()) {
+            year = sc.nextInt();
+            Book[] result = filterMinYear(year);
+            System.out.println("\nРезультат поиска книг, выпущенных после " + year + " года:");
+            if (result.length > 0) {
+                printForm(result);
+            } else {
+                System.out.println("Не найдено книг, выпущенных после "+ year +" года.");
+            }
+        } else {
+            System.out.println("Вы ввели не числовое значение.");
+        }
+
+        sc.close();
     }
 
     public void createCollection() {
@@ -67,21 +113,47 @@ public class Runner {
                 result[i] = collection[i];
             }
         }
-        return result;
+        return Arrays.stream(result).filter(Objects::nonNull).toArray(Book[]::new);
+    }
+
+    public Book [] findByPublisher (String publisher) {
+        Book[] result = new Book[collection.length];
+        for (int i=0; i < collection.length; i++) {
+            if (collection[i].getPublisher().equalsIgnoreCase(publisher)) {
+                result[i] = collection[i];
+            }
+        }
+        return Arrays.stream(result).filter(Objects::nonNull).toArray(Book[]::new);
+    }
+
+    public Book [] filterMinYear (int year) {
+        Book[] result = new Book[collection.length];
+        for (int i=0; i < collection.length; i++) {
+            if (collection[i].getYear() > year) {
+                result[i] = collection[i];
+            }
+        }
+        return Arrays.stream(result).filter(Objects::nonNull).toArray(Book[]::new);
     }
 
     public void printBase() {
-        Book.printDivider();
-        Book.printHeader();
-        Book.printDivider();
-        printCollection();
-        Book.printDivider();
-        System.out.println();
+        printForm(collection);
     }
 
-    private void printCollection() {
-        for (int i = 0; i < collection.length; i++) {
-            collection[i].printBook();
+    public void printForm(Book[] books) {
+        if (books != null) {
+            Book.printDivider();
+            Book.printHeader();
+            Book.printDivider();
+            printCollection(books);
+            Book.printDivider();
+            System.out.println();
+        }
+    }
+
+    private void printCollection(Book[] books) {
+        for (int i = 0; i < books.length; i++) {
+            books[i].printBook();
         }
     }
 
